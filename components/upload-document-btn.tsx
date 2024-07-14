@@ -9,6 +9,7 @@ import {
 import { Button } from "./ui/button";
 import { UploadDocumentForm } from "./upload-document-form";
 import { useState } from "react";
+import { Upload } from "lucide-react";
 
 export const UploadDocumentBtn = () => {
 
@@ -17,7 +18,10 @@ export const UploadDocumentBtn = () => {
     return (
         <Dialog open={isOpen} onOpenChange={setOpen} >
             <DialogTrigger asChild>
-                <Button>Upload a document</Button>
+                <Button className="gap-x-2">
+                    <Upload size={"18"} />
+                    Upload a document
+                </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
