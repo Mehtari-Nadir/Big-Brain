@@ -12,7 +12,7 @@ export const Provider = ({ children }: { children: React.ReactNode }) => {
     return (
         <ThemeProvider
             attribute="class"
-            defaultTheme="dark"
+            defaultTheme="system"
         >
             <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!}>
                 <ConvexProviderWithClerk client={convex} useAuth={useAuth}>

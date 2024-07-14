@@ -1,8 +1,15 @@
 import { mutation, query } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
 
+export const generateUploadUrl = mutation(async (ctx) => {
+    return await ctx.storage.generateUploadUrl();
+});
+
 export const createDocument = mutation({
-    args: { title: v.string() },
+    args: {
+        title: v.string(),
+        storageId: v.string()
+    },
 
     handler: async (ctx, args) => {
 
@@ -13,7 +20,8 @@ export const createDocument = mutation({
 
         await ctx.db.insert("documents", {
             title: args.title,
-            tokenIdentifier: userId
+            tokenIdentifier: userId,
+            storageId: args.storageId
         });
     }
 });
