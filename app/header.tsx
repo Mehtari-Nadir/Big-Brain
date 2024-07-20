@@ -8,8 +8,8 @@ export const Header = () => {
         <div className="bg-gray-900 p-4">
             <div className="container mx-auto flex justify-between items-center">
                 <Link href={"/"} className="flex items-center gap-x-1" >
-                    <Brain />
-                    <h1 className="text-2xl">BigBrain</h1>
+                    <Brain color="white" />
+                    <h1 className="text-white text-2xl">BigBrain</h1>
                 </Link>
                 <div className="flex items-center gap-2">
                     <ModeToggle />

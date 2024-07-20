@@ -30,7 +30,7 @@ export const UploadDocumentBtn = () => {
                         Upload a team document for you to search over in the future
                     </DialogDescription>
                 </DialogHeader>
-                <UploadDocumentForm onUpload={() => setOpen(false)} />
+                <UploadDocumentForm closeDialog={() => setOpen(false)} />
             </DialogContent>
         </Dialog>
     );

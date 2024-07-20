@@ -1,5 +1,6 @@
 "use client";
 
+import { ChatPanel } from "@/components/chat-panel";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useQuery } from "convex/react";
@@ -31,9 +32,7 @@ export default function DocumentPage({ params }: { params: { documentId: Id<"doc
                 <div className="bg-gray-900 p-4 rounded flex-1 h-[350px]">
                     {document.documentUrl && <iframe className="w-full h-full" src={document.documentUrl} />}
                 </div>
-                <div className="bg-gray-900 w-[350px] p-4">
-                    Ai chat
-                </div>
+                <ChatPanel documentId={document._id} />
             </div>
         </main>
     );

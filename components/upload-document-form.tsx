@@ -19,7 +19,7 @@ const formSchema = z.object({
     file: z.instanceof(File)
 });
 
-export const UploadDocumentForm = ({ onUpload }: { onUpload: () => void }) => {
+export const UploadDocumentForm = ({ closeDialog }: { closeDialog: () => void }) => {
 
     const createDocument = useMutation(api.documents.createDocument);
     const generateUploadUrl = useMutation(api.documents.generateUploadUrl);
@@ -49,7 +49,7 @@ export const UploadDocumentForm = ({ onUpload }: { onUpload: () => void }) => {
             title: values.title,
             storageId: storageId
         })
-        onUpload();
+        closeDialog();
     };
 
     return (
