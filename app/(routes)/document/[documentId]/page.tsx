@@ -4,6 +4,7 @@ import { ChatPanel } from "@/components/chat-panel";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useQuery } from "convex/react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function DocumentPage({ params }: { params: { documentId: Id<"documents"> } }) {
 
@@ -24,15 +25,30 @@ export default function DocumentPage({ params }: { params: { documentId: Id<"doc
     }
 
     return (
-        <main className="p-16 space-y-8">
+        <main className="p-10 space-y-8">
             <div className="flex items-center justify-between">
                 <h1 className="text-4xl font-bold">{document.title}</h1>
             </div>
-            <div className="flex gap-x-12">
-                <div className="bg-gray-900 p-4 rounded flex-1 h-[350px]">
-                    {document.documentUrl && <iframe className="w-full h-full" src={document.documentUrl} />}
-                </div>
-                <ChatPanel documentId={document._id} />
+            <div>
+                <Tabs defaultValue="document" className="w-full">
+                    <TabsList>
+                        <TabsTrigger value="document">Document</TabsTrigger>
+                        <TabsTrigger value="chat">Chat</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="document">
+                        <div className="bg-gray-900 p-2 rounded flex-1 h-[350px] w-full">
+                            { document.documentUrl && 
+                                <iframe
+                                    className="bg-gray-900 w-full h-full"
+                                    src={document.documentUrl}
+                                />
+                            }
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="chat">
+                        <ChatPanel documentId={document._id} />
+                    </TabsContent>
+                </Tabs>
             </div>
         </main>
     );

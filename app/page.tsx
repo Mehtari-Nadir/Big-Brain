@@ -10,7 +10,7 @@ export default function Home() {
 	const documents = useQuery(api.documents.getDocuments);
 
 	return (
-		<main className="p-16">
+		<main className="p-10">
 			<div className="flex items-center justify-between gap-x-4 mb-6">
 				<h1 className="text-4xl font-bold">My Documents</h1>
 				<UploadDocumentBtn />
