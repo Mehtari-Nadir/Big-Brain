@@ -75,7 +75,6 @@ export const getDocument = query({
     }
 });
 
-
 export const askQuestion = action({
     args: {
         question: v.string(),
