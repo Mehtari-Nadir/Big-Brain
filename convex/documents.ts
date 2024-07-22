@@ -1,11 +1,11 @@
 import { action, mutation, query } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
-import { api } from "./_generated/api";
-import Anthropic from "@anthropic-ai/sdk";
+import { api, internal } from "./_generated/api";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const anthropic = new Anthropic({
-    apiKey: process.env.ANTHROPIC_API_KEY, // This is the default and can be omitted
-});
+// * Google AI
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export const generateUploadUrl = mutation(async (ctx) => {
     return await ctx.storage.generateUploadUrl();
@@ -16,7 +16,6 @@ export const createDocument = mutation({
         title: v.string(),
         storageId: v.id("_storage")
     },
-
     handler: async (ctx, args) => {
 
         const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
@@ -32,10 +31,8 @@ export const createDocument = mutation({
     }
 });
 
-
 export const getDocuments = query({
     args: {},
-
     handler: async (ctx) => {
 
         const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
@@ -54,7 +51,7 @@ export const getDocument = query({
         documentId: v.id("documents")
     },
     handler: async (ctx, args) => {
-        // check authentication
+        // * check authentication
         const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
         if (!userId) {
             return null;
@@ -66,7 +63,7 @@ export const getDocument = query({
             return null;
         }
 
-        // check authorization
+        // * check authorization
         if (document.tokenIdentifier !== userId) {
             return null;
         }
@@ -107,19 +104,24 @@ export const askQuestion = action({
 
         const fileContent = await file.text();
 
-        const message = await anthropic.messages.create({
-            max_tokens: 1024,
-            system: `Here is a text file ${fileContent}`,
-            messages: [
-                {
-                    role: "user",
-                    content: `Please answer the question ${args.question}`
-                }
-            ],
-            model: 'claude-3-opus-20240229',
+        // * Google AI
+        const prompt = `Here is a text file ${fileContent}\n\nPlease answer the question ${args.question}`;
+        const result = await model.generateContent([prompt]);
+
+        // TODO: store user prompt as a chat record
+        await ctx.runMutation(internal.chats.createChatRecord, {
+            documentId: args.documentId,
+            tokenIdentifier: userId,
+            text: args.question,
+            isHuman: true
         });
 
-        console.log(message.content);
-
+        // TODO: store the AI response as a chat record
+        await ctx.runMutation(internal.chats.createChatRecord, {
+            documentId: args.documentId,
+            tokenIdentifier: userId,
+            text: result.response.text(),
+            isHuman: false
+        });
     }
 });
