@@ -33,7 +33,6 @@ export const getDocumentChats = query({
         return await ctx.db.query('chats')
             .withIndex("by_documentId_tokenIdentifier",
                 (q) => q.eq("documentId", args.documentId).eq("tokenIdentifier", userId)
-            )
-            .collect()
+            ).collect();
     }
 });

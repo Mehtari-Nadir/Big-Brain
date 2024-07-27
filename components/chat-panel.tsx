@@ -11,9 +11,8 @@ export const ChatPanel = ({ documentId }: { documentId: Id<"documents"> }) => {
     });
 
     return (
-        <div className="bg-gray-900 w-full h-[350px] p-2 rounded flex flex-col gap-2">
-
-            <div className="h-[300px] overflow-y-auto flex flex-col gap-y-2">
+        <div className="bg-gray-900 w-full h-[400px] p-2 rounded flex flex-col gap-2">
+            <div className="h-[350px] overflow-y-auto flex flex-col gap-y-2">
                 {chats?.map((chat, index) => {
                     return (
                         <div

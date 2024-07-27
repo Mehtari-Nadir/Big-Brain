@@ -1,4 +1,4 @@
-import { action, mutation, query } from "./_generated/server";
+import { action, internalAction, internalMutation, mutation, query } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
 import { api, internal } from "./_generated/api";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -23,11 +23,18 @@ export const createDocument = mutation({
             throw new ConvexError("Not authenticated");
         }
 
-        await ctx.db.insert("documents", {
+        const documentId = await ctx.db.insert("documents", {
             title: args.title,
             tokenIdentifier: userId,
-            storageId: args.storageId
+            storageId: args.storageId,
+            description: "",
+            isDescriptionNew: true
         });
+
+        await ctx.scheduler.runAfter(0, internal.documents.generateDocumentDescription, {
+            fileId: args.storageId,
+            documentId
+        })
     }
 });
 
@@ -107,7 +114,7 @@ export const askQuestion = action({
         const prompt = `Here is a text file ${fileContent}\n\nPlease answer the question ${args.question}`;
         const result = await model.generateContent([prompt]);
 
-        // TODO: store user prompt as a chat record
+        // * store user prompt as a chat record
         await ctx.runMutation(internal.chats.createChatRecord, {
             documentId: args.documentId,
             tokenIdentifier: userId,
@@ -115,12 +122,64 @@ export const askQuestion = action({
             isHuman: true
         });
 
-        // TODO: store the AI response as a chat record
+        // * store the AI response as a chat record
         await ctx.runMutation(internal.chats.createChatRecord, {
             documentId: args.documentId,
             tokenIdentifier: userId,
             text: result.response.text(),
             isHuman: false
         });
+    }
+});
+
+export const generateDocumentDescription = internalAction({
+    args: {
+        documentId: v.id("documents"),
+        fileId: v.id("_storage")
+    },
+    handler: async (ctx, args) => {
+
+        const file = await ctx.storage.get(args.fileId);
+        if (!file) {
+            throw new ConvexError("Document Not Found");
+        }
+        const fileContent = await file.text();
+
+        const prompt = `Here is a text file ${fileContent}\n\nPlease generate 1 sentence description for this document.`;
+        const result = await model.generateContentStream([prompt]);
+
+        let text = "";
+        for await (const chunk of result.stream) {
+            const chunkText = chunk.text();
+            text += chunkText;
+            // * run mutation
+            await ctx.runMutation(internal.documents.updateDocumentDescription, {
+                documentId: args.documentId,
+                description: text
+            });
+        }
+    }
+});
+
+export const updateDocumentDescription = internalMutation({
+    args: {
+        documentId: v.id("documents"),
+        description: v.string()
+    },
+    handler: async (ctx, args) => {
+        await ctx.db.patch(args.documentId, {
+            description: args.description
+        })
+    }
+});
+
+export const updateDescriptionState = mutation({
+    args: {
+        documentId: v.id("documents"),
+    },
+    handler: async (ctx, args) => {
+        await ctx.db.patch(args.documentId, {
+            isDescriptionNew: false
+        })
     }
 });

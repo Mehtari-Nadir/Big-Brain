@@ -1,35 +1,37 @@
 import {
     Card,
     CardContent,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
 import { Doc } from "@/convex/_generated/dataModel";
-import { Button } from "./ui/button";
-import { Eye } from "lucide-react";
-import Link from "next/link";
+import { Eye, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { TypeWriter } from "./type-writer";
 
 export const DocumentCard = ({ document }: { document: Doc<"documents"> }) => {
 
+    const router = useRouter();
+
+    const handleClick = () => {
+        router.push(`/document/${document._id}`);
+    }
+
     return (
-        <Card>
+        <Card
+            className="cursor-pointer hover:scale-105 transition duration-150"
+            onClick={handleClick}
+        >
             <CardHeader>
                 <CardTitle>{document.title}</CardTitle>
             </CardHeader>
             <CardContent>
-                <p>Content here.</p>
+                {document == undefined && <Loader2 className="animate-spin" />}
+                {(document.description && document.isDescriptionNew) && <TypeWriter documentId={document._id} text={document.description} delay={50} />}
+                {(document.description && !document.isDescriptionNew) && <p>{document.description}</p>}
+                {/* {!document.description ? <Loader2 className="animate-spin" /> : <p>{document.description}</p> } */}
+                {/* {!document.description ? <Loader2 className="animate-spin" /> : <TypeWriter text={document.description} delay={25} /> } */}
             </CardContent>
-            <CardFooter>
-                <Button asChild variant={"secondary"} className="gap-x-2">
-                    <Link
-                        href={`/document/${document._id}`}
-                    >
-                        <Eye size={"16"} />
-                        View
-                    </Link>
-                </Button>
-            </CardFooter>
         </Card>
     );
 }

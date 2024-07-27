@@ -25,7 +25,7 @@ export default function DocumentPage({ params }: { params: { documentId: Id<"doc
     }
 
     return (
-        <main className="p-10 space-y-8">
+        <main className="p-10 space-y-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-4xl font-bold">{document.title}</h1>
             </div>
@@ -36,7 +36,7 @@ export default function DocumentPage({ params }: { params: { documentId: Id<"doc
                         <TabsTrigger value="chat">Chat</TabsTrigger>
                     </TabsList>
                     <TabsContent value="document">
-                        <div className="bg-gray-900 p-2 rounded flex-1 h-[350px] w-full">
+                        <div className="bg-gray-900 p-2 rounded flex-1 h-[400px] w-full">
                             { document.documentUrl && 
                                 <iframe
                                     className="bg-gray-900 w-full h-full"
