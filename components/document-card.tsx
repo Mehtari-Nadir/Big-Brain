@@ -29,8 +29,6 @@ export const DocumentCard = ({ document }: { document: Doc<"documents"> }) => {
                 {document == undefined && <Loader2 className="animate-spin" />}
                 {(document.description && document.isDescriptionNew) && <TypeWriter documentId={document._id} text={document.description} delay={50} />}
                 {(document.description && !document.isDescriptionNew) && <p>{document.description}</p>}
-                {/* {!document.description ? <Loader2 className="animate-spin" /> : <p>{document.description}</p> } */}
-                {/* {!document.description ? <Loader2 className="animate-spin" /> : <TypeWriter text={document.description} delay={25} /> } */}
             </CardContent>
         </Card>
     );

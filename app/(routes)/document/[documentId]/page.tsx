@@ -5,6 +5,7 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useQuery } from "convex/react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LoadingDocumentPage } from "@/components/loading-doc-page";
 
 export default function DocumentPage({ params }: { params: { documentId: Id<"documents"> } }) {
 
@@ -14,21 +15,17 @@ export default function DocumentPage({ params }: { params: { documentId: Id<"doc
 
     if (!document) {
         return (
-            <main className="p-16">
-                <div className="flex mb-6">
-                    <h1 className="text-xl font-bold">
-                        You Don't have access to view this document.
-                    </h1>
-                </div>
+            <main className="p-10 space-y-6">
+                <LoadingDocumentPage />
             </main>
         );
     }
 
     return (
         <main className="p-10 space-y-6">
-            <div className="flex items-center justify-between">
-                <h1 className="text-4xl font-bold">{document.title}</h1>
-            </div>
+            {/* <div className="bg-red-500 flex items-center justify-center">
+                <h1 className="text-xl font-bold">{document.title}</h1>
+            </div> */}
             <div>
                 <Tabs defaultValue="document" className="w-full">
                     <TabsList>
