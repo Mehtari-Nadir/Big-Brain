@@ -4,6 +4,7 @@ import "./globals.css";
 import { Provider } from "./provider";
 import { cn } from "@/lib/utils";
 import { Header } from "./header";
+import { Toaster } from "@/components/ui/sonner";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -29,6 +30,7 @@ export default function RootLayout({
         <Provider>
           <Header />
           {children}
+          <Toaster />
         </Provider>
       </body>
     </html>

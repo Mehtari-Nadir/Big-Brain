@@ -4,11 +4,11 @@ import { Loader2 } from "lucide-react";
 export const LoadingButton = ({
     isSubmitting,
     loadingText,
-    children
+    children,
 }: {
     isSubmitting: boolean,
     loadingText: string,
-    children: React.ReactNode
+    children: React.ReactNode,
 }) => {
     return (
         <Button disabled={isSubmitting} type="submit" className="gap-x-2">

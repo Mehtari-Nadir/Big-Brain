@@ -6,6 +6,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { useQuery } from "convex/react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LoadingDocumentPage } from "@/components/loading-doc-page";
+import { DeleteDocumentButton } from "@/components/delete-doc-btn";
 
 export default function DocumentPage({ params }: { params: { documentId: Id<"documents"> } }) {
 
@@ -23,9 +24,10 @@ export default function DocumentPage({ params }: { params: { documentId: Id<"doc
 
     return (
         <main className="p-10 space-y-6">
-            {/* <div className="bg-red-500 flex items-center justify-center">
-                <h1 className="text-xl font-bold">{document.title}</h1>
-            </div> */}
+            <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-bold">{document.title}</h1>
+                <DeleteDocumentButton fileId={document.storageId} documentId={document._id} />
+            </div>
             <div>
                 <Tabs defaultValue="document" className="w-full">
                     <TabsList>
@@ -34,7 +36,7 @@ export default function DocumentPage({ params }: { params: { documentId: Id<"doc
                     </TabsList>
                     <TabsContent value="document">
                         <div className="bg-gray-900 p-2 rounded flex-1 h-[400px] w-full">
-                            { document.documentUrl && 
+                            {document.documentUrl &&
                                 <iframe
                                     className="bg-gray-900 w-full h-full"
                                     src={document.documentUrl}

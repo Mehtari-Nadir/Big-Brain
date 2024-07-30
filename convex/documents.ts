@@ -183,3 +183,14 @@ export const updateDescriptionState = mutation({
         })
     }
 });
+
+export const deleteDocument = mutation({
+    args: {
+        documentId: v.id("documents"),
+        fileId: v.id("_storage")
+    },
+    handler: async (ctx, args) => {
+        await ctx.db.delete(args.documentId);
+        await ctx.storage.delete(args.fileId);
+    }
+})
