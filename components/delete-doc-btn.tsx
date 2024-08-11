@@ -8,14 +8,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-export const DeleteDocumentButton = ({ documentId, fileId }: { documentId: Id<"documents">, fileId: Id<"_storage"> }) => {
+export const DeleteDocumentButton = ({ documentId }: { documentId: Id<"documents"> }) => {
 
     const deleteDocument = useMutation(api.documents.deleteDocument);
     const [isLoading, setLoading] = useState(false);
     const router = useRouter();
 
     const handleDelete = async () => {
-        await deleteDocument({ documentId, fileId });
+        await deleteDocument({ documentId });
         router.push("/");
         toast.success("The document has been deleted successfully");
     }

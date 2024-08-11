@@ -1,7 +1,8 @@
-import { action, internalAction, internalMutation, mutation, query } from "./_generated/server";
+import { action, internalAction, internalMutation, internalQuery, mutation, MutationCtx, query, QueryCtx } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
 import { api, internal } from "./_generated/api";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { Id } from "./_generated/dataModel";
 
 // * Google AI
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
@@ -9,6 +10,38 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export const generateUploadUrl = mutation(async (ctx) => {
     return await ctx.storage.generateUploadUrl();
+});
+
+export const hasAccessToDocument = async (
+    ctx: MutationCtx | QueryCtx,
+    documentId: Id<"documents">
+) => {
+    // * check Authentication
+    const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
+    if (!userId) {
+        return null;
+    }
+
+    const document = await ctx.db.get(documentId);
+    if (!document) {
+        return null;
+    }
+
+    // * check authorization
+    if (document.tokenIdentifier !== userId) {
+        return null;
+    }
+
+    return { document, userId };
+}
+
+export const hasAccessToDocumentQuery = internalQuery({
+    args: {
+        documentId: v.id("documents"),
+    },
+    handler: async (ctx, args) => {
+        return await hasAccessToDocument(ctx, args.documentId);
+    }
 });
 
 export const createDocument = mutation({
@@ -58,26 +91,16 @@ export const getDocument = query({
         documentId: v.id("documents")
     },
     handler: async (ctx, args) => {
-        // * check authentication
-        const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
-        if (!userId) {
-            return null;
-        }
 
-        const document = await ctx.db.get(args.documentId);
+        const accessObj = await hasAccessToDocument(ctx, args.documentId);
 
-        if (!document) {
-            return null;
-        }
-
-        // * check authorization
-        if (document.tokenIdentifier !== userId) {
+        if (!accessObj) {
             return null;
         }
 
         return {
-            ...document,
-            documentUrl: await ctx.storage.getUrl(document.storageId)
+            ...accessObj.document,
+            documentUrl: await ctx.storage.getUrl(accessObj.document.storageId)
         };
     }
 });
@@ -89,20 +112,15 @@ export const askQuestion = action({
     },
     handler: async (ctx, args) => {
 
-        const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
-        if (!userId) {
-            throw new ConvexError("Not authenticated");
-        }
-
-        const document = await ctx.runQuery(api.documents.getDocument, {
+        const accessObj = await ctx.runQuery(internal.documents.hasAccessToDocumentQuery, {
             documentId: args.documentId
-        });
+        })
 
-        if (!document) {
-            throw new ConvexError("Document not found");
+        if (!accessObj) {
+            throw new ConvexError("You do not have access to this document.")
         }
 
-        const file = await ctx.storage.get(document.storageId);
+        const file = await ctx.storage.get(accessObj.document.storageId);
 
         if (!file) {
             throw new ConvexError("File not found");
@@ -117,7 +135,7 @@ export const askQuestion = action({
         // * store user prompt as a chat record
         await ctx.runMutation(internal.chats.createChatRecord, {
             documentId: args.documentId,
-            tokenIdentifier: userId,
+            tokenIdentifier: accessObj.userId,
             text: args.question,
             isHuman: true
         });
@@ -125,7 +143,7 @@ export const askQuestion = action({
         // * store the AI response as a chat record
         await ctx.runMutation(internal.chats.createChatRecord, {
             documentId: args.documentId,
-            tokenIdentifier: userId,
+            tokenIdentifier: accessObj.userId,
             text: result.response.text(),
             isHuman: false
         });
@@ -187,10 +205,16 @@ export const updateDescriptionState = mutation({
 export const deleteDocument = mutation({
     args: {
         documentId: v.id("documents"),
-        fileId: v.id("_storage")
     },
     handler: async (ctx, args) => {
+
+        const accessObj = await hasAccessToDocument(ctx, args.documentId);
+
+        if (!accessObj) {
+            throw new ConvexError("You do not have access to this document.");
+        }
+
         await ctx.db.delete(args.documentId);
-        await ctx.storage.delete(args.fileId);
+        await ctx.storage.delete(accessObj.document.storageId);
     }
 })
