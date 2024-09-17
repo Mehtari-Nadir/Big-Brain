@@ -5,7 +5,7 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Doc } from "@/convex/_generated/dataModel";
-import { Eye, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { TypeWriter } from "./type-writer";
 
@@ -14,7 +14,7 @@ export const DocumentCard = ({ document }: { document: Doc<"documents"> }) => {
     const router = useRouter();
 
     const handleClick = () => {
-        router.push(`/document/${document._id}`);
+        router.push(`/dashboard/documents/${document._id}`);
     }
 
     return (

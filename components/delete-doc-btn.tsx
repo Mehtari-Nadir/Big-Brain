@@ -1,17 +1,14 @@
-
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 export const DeleteDocumentButton = ({ documentId }: { documentId: Id<"documents"> }) => {
 
     const deleteDocument = useMutation(api.documents.deleteDocument);
-    const [isLoading, setLoading] = useState(false);
     const router = useRouter();
 
     const handleDelete = async () => {

@@ -23,10 +23,10 @@ export default function DocumentPage({ params }: { params: { documentId: Id<"doc
     }
 
     return (
-        <main className="p-10 space-y-6">
+        <main className="px-10 pt-10 space-y-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold">{document.title}</h1>
-                <DeleteDocumentButton fileId={document.storageId} documentId={document._id} />
+                <DeleteDocumentButton documentId={document._id} />
             </div>
             <div>
                 <Tabs defaultValue="document" className="w-full">
