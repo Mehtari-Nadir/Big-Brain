@@ -7,7 +7,7 @@ import { NoteCard } from "@/components/note-card";
 import { LoadingNoteSkeleton } from "@/components/loading-note";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DeleteNoteBtn } from "@/components/delete-note-btn";
 import { Id } from "@/convex/_generated/dataModel";
 import { EditNoteBtn } from "@/components/edit-note-btn";
@@ -18,6 +18,12 @@ const NotesPage = () => {
 
     const [noteValue, setNoteValue] = useState("");
     const [currentNote, setCurrentNote] = useState<Id<"notes">>();
+    const [originalNoteValue, setOriginalNoteValue] = useState("");
+    const [isEdited, setEdited] = useState(false);
+
+    useEffect(() => {
+        setEdited(noteValue != originalNoteValue);
+    }, [noteValue, originalNoteValue]);
 
     return (
         <main className="p-10">
@@ -31,9 +37,11 @@ const NotesPage = () => {
                                 clearStates={() => {
                                     setNoteValue("");
                                     setCurrentNote(undefined);
+                                    setEdited(false);
+                                    setOriginalNoteValue("");
                                 }}
                             />
-                            {/* <EditNoteBtn /> */}
+                            { isEdited && <EditNoteBtn noteId={currentNote} noteValue={noteValue} /> }
                         </>
                     }
                     <UploadNoteBtn />
@@ -51,7 +59,8 @@ const NotesPage = () => {
                                 note={note}
                                 onClick={() => {
                                     setCurrentNote(note._id);
-                                    setNoteValue(note.text)
+                                    setNoteValue(note.text);
+                                    setOriginalNoteValue(note.text);
                                 }}
                             />
                         );

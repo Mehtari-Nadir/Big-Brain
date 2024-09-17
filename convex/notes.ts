@@ -35,7 +35,7 @@ export const getNotes = query({
             .withIndex("by_tokenIdentifier", (q) => q.eq("tokenIdentifier", userId))
             .collect();
     }
-})
+});
 
 export const deleteNote = mutation({
     args: {
@@ -62,4 +62,16 @@ export const deleteNote = mutation({
 
         await ctx.db.delete(args.noteId);
     }
-})
+});
+
+export const editNote = mutation({
+    args: {
+        noteId: v.id("notes"),
+        newNote: v.string(),
+    },
+    handler: async (ctx, args) => {
+        await ctx.db.patch(args.noteId, {
+            text: args.newNote
+        })
+    }
+});
