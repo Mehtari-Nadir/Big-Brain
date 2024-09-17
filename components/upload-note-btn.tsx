@@ -21,8 +21,8 @@ export const UploadNoteBtn = () => {
         <Dialog open={isOpen} onOpenChange={setOpen} >
             <DialogTrigger asChild>
                 <Button className="gap-x-2">
-                    <PlusIcon size={"18"} />
                     Create Note
+                    <PlusIcon size={"18"} />
                 </Button>
             </DialogTrigger>
             <DialogContent>
