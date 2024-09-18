@@ -1,6 +1,6 @@
 import { action, internalAction, internalMutation, internalQuery, mutation, MutationCtx, query, QueryCtx } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
-import { api, internal } from "./_generated/api";
+import { internal } from "./_generated/api";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Id } from "./_generated/dataModel";
 

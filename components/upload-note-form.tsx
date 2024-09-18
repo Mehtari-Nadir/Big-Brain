@@ -18,7 +18,7 @@ import { toast } from "sonner";
 const formSchema = z.object({
     text: z.string()
         .min(5, { message: "Hey the content is not enough" })
-        .max(2500, { message: "Its too loong" })
+        .max(5000, { message: "Its too loong" })
         .trim(),
 });
 

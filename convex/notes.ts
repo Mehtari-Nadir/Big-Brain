@@ -1,6 +1,44 @@
-import { argv } from "process";
-import { mutation, query } from "./_generated/server";
+import { internalAction, internalMutation, mutation, query } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { internal } from "./_generated/api";
+
+// * Google AI
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
+const model = genAI.getGenerativeModel({ model: "text-embedding-004"});
+
+const embed = async (text: string) => {
+    const result = await model.embedContent(text);
+    return result.embedding.values;
+}
+
+export const setNodeEmbedding = internalMutation({
+    args: {
+        noteId: v.id("notes"),
+        embedding: v.array(v.float64())
+    },
+    handler: async (ctx, args) => {
+        await ctx.db.patch(args.noteId, {
+            embedding: args.embedding
+        });
+    }
+});
+
+export const createNoteEmbedding = internalAction({
+    args: {
+        noteId: v.id("notes"),
+        text: v.string()
+    },
+    handler: async (ctx, args) => {
+        
+        const embedding = await embed(args.text);
+
+        await ctx.runMutation(internal.notes.setNodeEmbedding, {
+            noteId: args.noteId,
+            embedding,
+        });
+    }
+});
 
 export const createNote = mutation({
     args: {
@@ -16,6 +54,11 @@ export const createNote = mutation({
 
         const noteId = await ctx.db.insert("notes", {
             tokenIdentifier: userId,
+            text: args.text,
+        });
+
+        await ctx.scheduler.runAfter(0, internal.notes.createNoteEmbedding, {
+            noteId,
             text: args.text
         });
     }
