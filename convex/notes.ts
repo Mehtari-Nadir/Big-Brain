@@ -7,7 +7,7 @@ import { internal } from "./_generated/api";
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
 const model = genAI.getGenerativeModel({ model: "text-embedding-004"});
 
-const embed = async (text: string) => {
+export const embed = async (text: string) => {
     const result = await model.embedContent(text);
     return result.embedding.values;
 }
@@ -116,5 +116,14 @@ export const editNote = mutation({
         await ctx.db.patch(args.noteId, {
             text: args.newNote
         })
+    }
+});
+
+export const getNote = query({
+    args: {
+        noteId: v.id("notes"),
+    },
+    handler: async (ctx, args) => {
+        return await ctx.db.get(args.noteId);
     }
 });

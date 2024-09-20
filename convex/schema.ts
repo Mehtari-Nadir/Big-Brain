@@ -26,7 +26,7 @@ export default defineSchema({
         .index("by_tokenIdentifier", ["tokenIdentifier"])
         .vectorIndex("by_embedding", {
         vectorField: "embedding",
-        dimensions: 1536,
+        dimensions: 768,
         filterFields: ["tokenIdentifier"]
     })
 });
