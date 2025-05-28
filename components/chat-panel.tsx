@@ -1,8 +1,8 @@
 import { api } from "@/convex/_generated/api";
-import { useAction, useQuery } from "convex/react";
+import { useQuery } from "convex/react";
 import { Id } from "@/convex/_generated/dataModel";
-import { cn } from "@/lib/utils";
 import { ChatForm } from "./chat-form";
+import MarkDown from 'react-markdown';
 
 export const ChatPanel = ({ documentId }: { documentId: Id<"documents"> }) => {
 
@@ -11,36 +11,26 @@ export const ChatPanel = ({ documentId }: { documentId: Id<"documents"> }) => {
     });
 
     return (
-        <div className="bg-gray-900 w-full h-[400px] p-2 rounded flex flex-col gap-2">
-            <div className="h-[350px] overflow-y-auto flex flex-col gap-y-2">
-                {chats?.map((chat, index) => {
-                    return (
+        <div className="flex flex-col h-screen bg-gray-100">
+            <div className="flex-1 overflow-y-auto p-4">
+                {chats?.map((chat, index) => (
+                    <div key={index} className={`flex ${chat.isHuman ? "justify-end" : "justify-start"} mb-4`}>
                         <div
-                            key={index}
-                            className={cn(
-                                {
-                                    "flex items-center justify-end ml-10": chat.isHuman,
-                                    "mr-10": !chat.isHuman
-                                },
-                                "p-2"
-                            )}
+                            className={`max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl rounded-lg p-3 ${chat.isHuman ? "bg-blue-500 text-white" : "bg-white text-gray-800"
+                                }`}
                         >
-                            <div
-                                className={cn(
-                                    {
-                                        "bg-gray-500 text-right": chat.isHuman,
-                                        "bg-gray-950 whitespace-pre-line": !chat.isHuman
-                                    },
-                                    "rounded p-2 w-fit"
-                                )}
-                            >
-                                {chat.text}
-                            </div>
+                            <MarkDown>{chat.text}</MarkDown>
                         </div>
-                    );
-                })}
+                    </div>
+                ))}
             </div>
-            <ChatForm documentId={documentId} />
+            <div className="bg-white border-t border-gray-200 p-4">
+                <div className="flex items-center">
+                    <div className="w-full text-black">
+                        <ChatForm documentId={documentId} />
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

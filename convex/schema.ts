@@ -8,8 +8,15 @@ export default defineSchema({
         tokenIdentifier: v.string(),
         storageId: v.id("_storage"),
         description: v.string(),
-        isDescriptionNew: v.boolean()
-    }).index("by_tokenIdentifier", ["tokenIdentifier"]),
+        isDescriptionNew: v.boolean(),
+        embedding: v.optional(v.array(v.float64()))
+    })
+        .index("by_tokenIdentifier", ["tokenIdentifier"])
+        .vectorIndex("by_embedding", {
+            vectorField: "embedding",
+            dimensions: 768,
+            filterFields: ["tokenIdentifier"]
+        }),
 
     chats: defineTable({
         documentId: v.id("documents"),

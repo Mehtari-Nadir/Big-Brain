@@ -12,7 +12,7 @@ export const embed = async (text: string) => {
     return result.embedding.values;
 }
 
-export const setNodeEmbedding = internalMutation({
+export const setNoteEmbedding = internalMutation({
     args: {
         noteId: v.id("notes"),
         embedding: v.array(v.float64())
@@ -33,7 +33,7 @@ export const createNoteEmbedding = internalAction({
         
         const embedding = await embed(args.text);
 
-        await ctx.runMutation(internal.notes.setNodeEmbedding, {
+        await ctx.runMutation(internal.notes.setNoteEmbedding, {
             noteId: args.noteId,
             embedding,
         });

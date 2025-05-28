@@ -4,6 +4,8 @@ import { embed } from "./notes";
 import { v } from "convex/values";
 import { Doc } from "./_generated/dataModel";
 
+type TRecord = { type: "notes"; record: Doc<"notes"> }[] | { type: "documents"; record: Doc<"documents"> }[]
+
 export const searchAction = action({
     args: {
         search: v.string()
@@ -19,9 +21,11 @@ export const searchAction = action({
         const embedding = await embed(args.search);
         const results = await ctx.vectorSearch("notes", "by_embedding", {
             vector: embedding,
-            limit: 16,
+            limit: 1,
             filter: (q) => q.eq("tokenIdentifier", userId)
         });
+
+        const records: TRecord = [];
 
         const notes = (await Promise.all(
             results.map(async (result) => {
@@ -31,6 +35,8 @@ export const searchAction = action({
                 return note;
             }).filter(Boolean)
         )) as Doc<"notes">[];
+
+        console.log(results);
 
         return notes;
     }

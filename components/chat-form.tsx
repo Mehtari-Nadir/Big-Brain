@@ -21,7 +21,7 @@ const formSchema = z.object({
     text: z.string().min(1).max(250),
 });
 
-export const ChatForm = ({documentId}: {documentId: Id<"documents">}) => {
+export const ChatForm = ({ documentId }: { documentId: Id<"documents"> }) => {
 
     const askQuestion = useAction(api.documents.askQuestion);
 
@@ -65,7 +65,6 @@ export const ChatForm = ({documentId}: {documentId: Id<"documents">}) => {
                         </FormItem>
                     )}
                 />
-                
                 <LoadingButton
                     isSubmitting={form.formState.isSubmitting}
                     loadingText="Submiting..."
